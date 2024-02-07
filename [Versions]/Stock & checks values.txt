@@ -1,0 +1,93 @@
+import openpyxl
+import os
+
+def normalize_header(header):
+    if header is None:
+        return None
+    return ' '.join(header.replace("\n", " ").replace("\r", " ").split())
+
+def find_column_indices(sheet, headers):
+    header_to_index = {normalize_header(cell.value): cell.column for cell in sheet[1]}
+    return {header: header_to_index.get(header) for header in headers if header in header_to_index}
+
+def replace_formulas_with_values(sheet, values_sheet, column_indices, vrm_col_index):
+    for row in range(2, sheet.max_row + 1):
+        # Skip rows where VRM is 0
+        vrm_cell = sheet.cell(row=row, column=vrm_col_index)
+        if vrm_cell.value == 0:
+            continue
+        
+        for col_header, col_index in column_indices.items():
+            if col_index is None:
+                continue
+            
+            original_cell = sheet.cell(row=row, column=col_index)
+            value_cell = values_sheet.cell(row=row, column=col_index)
+            original_cell.value = value_cell.value
+
+def process_output_sheet(workbook, values_workbook, sheet_name, headers):
+    if sheet_name in workbook.sheetnames:
+        sheet = workbook[sheet_name]
+        values_sheet = values_workbook[sheet_name]
+
+        column_indices = find_column_indices(sheet, headers)
+        vrm_col_index = column_indices.get("VRM")
+        if vrm_col_index is None:
+            raise ValueError("VRM column not found in OUTPUT sheet.")
+
+        replace_formulas_with_values(sheet, values_sheet, column_indices, vrm_col_index)
+
+def process_schedule_sheet(workbook, values_workbook, sheet_name):
+    if sheet_name in workbook.sheetnames:
+        sheet = workbook[sheet_name]
+        values_sheet = values_workbook[sheet_name]
+
+        # Unmerge all cells
+        for merged_cell_range in list(sheet.merged_cells.ranges):
+            sheet.unmerge_cells(str(merged_cell_range))
+
+        # Update cell values
+        for row in sheet.iter_rows(min_row=1, max_row=sheet.max_row, max_col=sheet.max_column):
+            for cell in row:
+                value_cell = values_sheet.cell(row=cell.row, column=cell.column)
+                cell.value = value_cell.value
+
+def main(file_path):
+    print("Starting processing of workbook...")
+    print("Loading workbooks...")
+    workbook = openpyxl.load_workbook(file_path, data_only=False)
+    values_workbook = openpyxl.load_workbook(file_path, data_only=True)
+
+    output_headers = [
+        "Supp", "VRM", "Make", "Model", "F", "Yr", "Description", "Dr", "Spec", "Spec £", "Yr Pl", "Mileage", "Colour", "A", "IF4C",
+        "By", "Status", "Sold", "CAP Cl Mth", "CAP Cl Live", "Cost", "SIV", "Current Price",
+        "DIS", "Days Live", "0% Days", "AT Price", "1st AT", "CAP Ret Live",
+        "RR", "AT Perf", "AT Last Change", "Chg Date", "Chg Days", "Total change", "Review Due", "Last Check", "Recon", "Net Margin", "7 day views", "Stock", "Loc", "Review Cat", "Price Cat", "Img", "CAPID", "To price", "Sugg"
+    ]
+
+    print("Processing the 'OUTPUT' sheet...")
+    process_output_sheet(workbook, values_workbook, "OUTPUT", output_headers)
+
+    print("Processing the 'Schedule' sheet...")
+    process_schedule_sheet(workbook, values_workbook, "Schedule")
+
+    # Deleting specified worksheets
+    sheets_to_delete = ["MASTER_work", "CAP_Models", "Comm", "Lookups", "Pricing_Formula", 
+                        "Apex_Stock", "AT_Forecourt", "AT_Initial", "Loc_Hist", "0%_Stock", 
+                        "C2P", "Price_changes", "RWA", "VA"]
+    for sheet in sheets_to_delete:
+        if sheet in workbook.sheetnames:
+            del workbook[sheet]
+            print(f"Deleted sheet: {sheet}")
+
+    # Save the workbook with a new name
+    base_name, extension = os.path.splitext(file_path)
+    new_file_path = f"{base_name}_values{extension}"
+    workbook.save(new_file_path)
+    print(f"Workbook saved as '{new_file_path}'.")
+
+    print("Processing complete.")
+
+# Path to the Excel file
+file_path = r"C:\Users\Tom\OneDrive - Motor Depot\Pricing\Stock and checks 2023_11_15.xlsx"
+main(file_path)

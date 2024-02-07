@@ -1,0 +1,32 @@
+Write a Python script for this
+
+There could be BOM characters in any file
+
+Folder C:\Users\Tom\OneDrive - Motor Depot\Pricing\Autotrader Forecourt Export\Logged Forecourt
+
+Contains multiple files in the format Exported Forecourt_2023_11_07.csv where 2023_11_07 is yyyy_mm_dd
+
+The folder also contains __MASTER_Initial_AT_yyyy_mm_dd.csv where yyyy_mm_dd could be any date (call this old MASTER_Initial)
+
+
+Do the following:
+
+Expected headers in all files are
+
+Description	Alerts	VRM	Mileage	Days in stock	Strategy phase	Retail price	Admin fee	Price indicator	Price position	VAT status	Retail valuation	Price Status	SIV	Auto Trader Retail Rating	Days to sell	Live market condition	Days since last price change	Last price change	Total price difference	Images	Video	Attention grabber	Auto Trader	My Website	Partner sites	Dealer Auction	Retailer store page	UVL	Stock status	Vehicle type	MOT expiry	Colour	Fuel	Body Type	Registration date	Doors	Performance rating	Performance rating score	Yesterdays search appearances	Yesterdays advert views	Last 7 days search appearances	Last 7 days advert views	Days since last update	My reference	Site	Vehicle check status	Vin
+
+Cycle through each Exported Forecourt*.csv file and remove all rows where header "Retail price" is zero
+
+Now create a new file __MASTER_Initial_AT_yyyy_mm_dd with today's date.  If the file already exists, create a new file with a new name
+There will always be an old MASTER Initial file with a previous date.  Never modify this file.  Always create a new file
+Copy the contents of the old MASTER_Initial file into the top of the new MASTER_Initial file
+Copy the contents of the oldest Exported Forecourt file underneath
+Copy the contents of the next oldest Exported Forecourt file underneath that
+Continue until the contents of all Exported Forecourt files have been copied to the new MASTER_Initial file
+
+Verify and print how many rows have been copied from each file
+Deduplicate the new MASTER_Initial file on the VRM column only
+Print how many rows have been removed by deduplication of VRM
+Print how many rows are in the new MASTER_Initial file
+
+Any questions?

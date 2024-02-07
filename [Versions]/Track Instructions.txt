@@ -1,0 +1,36 @@
+I need a Python script for the following
+
+C:\Users\Tom\OneDrive - Motor Depot\Autoview\ contains
+
+__MASTER_Track*.csv
+
+There could be anything where the * is
+
+C:\Users\Tom\OneDrive - Motor Depot\Autoview\
+
+also contains multiple files like this:
+
+track-2023_10_19.csv
+track-2023_10_20.csv
+
+These file will always end in the date, as yyyy_mm_dd
+
+Please do the following
+
+Create a new __MASTER_Track.csv file with the date appended to the end as _yyyy_mm_dd, e.g. __MASTER_Track_2023_11_07.csv
+Always use these headers:
+ID	RegLetter	SalesStatus	StockType	Company	Contacts	StockNumber	Reg	Year	Mileage	CarMake	CarModel	Make	Model	Extras	PXOverAllowance	BuyingPrice	Workshop	DeliveryCharge	Warranty	Dummy	Salesman	Expr1022	Bonus	Location	Category	DaysInStock	PurchaseDate	RFL	FinanceCommission	PPP	Contacts	Discount	ImportDuty	CustomerSource	VIN	SIV	PXStandValue	PXID	WD	VatReportType	VatDue	VatMargin	VatSelling	Profit	CostsTotalMgnt	CostsTotal	TotalCosts	SalesTotal	TotalVatSelling	Writedown	InStock	Flag	Colour	TDA	PX	NumberOwners	TotalBP	TotalPrice	VBP	VBPI	TotalBPI	GlassTrade	CAPTrade	RemoveGrouping	SalesDate	Emissions	Art	Interior	DateRegistered	Variant	ReconCost
+
+Copy the contents of the most recent track-*.csv file to the top of the new MASTER_Track file
+Copy the contents of the NEXT MOST RECENT track-*.csv underneath the previous file, in the new MASTER_Track file
+Continue copying track-*.csv files underneath the previous one until all files are processed
+In Pycharm, show the number of rows copied for each track-*.csv file
+Once all track-*.csv files are processed, copy the contents of the PREVIOUS __MASTER_Track file to the BOTTOM of the new file.  Show the number of rows processed in Pycharm
+Verify that the number of rows in the new file equals the sum of all the track-*.csv files plus the old MASTER_Track file
+Now rename the track-*.csv files in the format track_yyyy_mm_dd.csv
+Now move all track_yyyy_mm_dd.csv files to C:\Users\Tom\OneDrive - Motor Depot\Autoview\Archived\
+Show how many files were moved
+Move the old MASTER_Track file to C:\Users\Tom\OneDrive - Motor Depot\Autoview\Archived and show in Pycharm
+Now deduplicate the new MASTER_Track file on the StockNumber column
+Show how many rows were removed by deduplication
+Show how many rows remain in the new MASTER_Track file

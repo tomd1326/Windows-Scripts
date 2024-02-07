@@ -1,0 +1,2 @@
+2023-12-08 17:37:48,531 ERROR:An error occurred: 'Workbook' object has no attribute 'calculate'
+2023-12-08 18:46:47,630 ERROR:An error occurred: [Errno 13] Permission denied: 'C:\\Users\\Tom\\OneDrive - Motor Depot\\Pricing\\Stock and checks 2023_12_08_1846.xlsx'

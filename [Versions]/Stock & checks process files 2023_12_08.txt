@@ -1,0 +1,81 @@
+import os
+import shutil
+import pandas as pd
+import glob
+
+def move_to_processed(file_path, processed_folder):
+    if not os.path.exists(processed_folder):
+        os.makedirs(processed_folder)
+    shutil.move(file_path, processed_folder)
+    print(f'Moved {file_path} to {processed_folder}')
+
+def process_full_stock(file_path, processed_folder):
+    # Create CSV copy first
+    df = pd.read_excel(file_path, engine='openpyxl')
+    modified_path = file_path.replace('.xlsx', '_modified.csv')
+    df.to_csv(modified_path, index=False, encoding='utf-8-sig')
+
+    # Now read the CSV and apply filtering
+    df_csv = pd.read_csv(modified_path, encoding='utf-8-sig')
+    original_row_count = len(df_csv)
+    # Adjusted condition with explicit copy
+    df_csv_filtered = df_csv[~((df_csv['Status'] == 'COURTESY') | (df_csv['Location'] == 'COURTESY'))].copy()
+    
+    # Calculate the number of rows removed
+    rows_removed = original_row_count - len(df_csv_filtered)
+
+    # Clear specific columns and save the filtered data
+    df_csv_filtered['Notes'] = ''
+    df_csv_filtered['Standard Equipment'] = ''
+    df_csv_filtered['Classified Features'] = ''
+    df_csv_filtered.to_csv(modified_path, index=False, encoding='utf-8-sig')
+
+    print(f'Full Stock file processed and saved as {modified_path}')
+    print(f'Removed {rows_removed} rows from Full Stock file.')
+    move_to_processed(file_path, processed_folder)
+
+def process_zero_stock(file_path, processed_folder):
+    df = pd.read_excel(file_path, engine='openpyxl')
+    modified_path = file_path.replace('.xlsx', '_modified.csv')
+    df.to_csv(modified_path, index=False, encoding='utf-8-sig')
+    print(f'0% Stock file processed and saved as {modified_path}')
+    move_to_processed(file_path, processed_folder)
+
+def process_location(file_path, processed_folder):
+    df = pd.read_csv(file_path, encoding='utf-8-sig')
+    original_row_count = len(df)
+
+    df['Date Arrived'] = pd.to_datetime(df['Date Arrived'], dayfirst=True)
+    df = df.sort_values(by='Date Arrived')
+    valid_locations = ['FORECOURT', 'READY TODAY', 'GL COMPOUND', 'SF COMPOUND', 'TEMP LOAN CAR', 'COMPANY CAR']
+    df_filtered = df[df['Location'].isin(valid_locations)]
+    rows_removed = original_row_count - len(df_filtered)
+
+    modified_path = file_path.replace('.csv', '_modified.csv')
+    df_filtered.to_csv(modified_path, index=False, encoding='utf-8-sig')
+    print(f'Location file processed and saved as {modified_path}')
+    print(f'Removed {rows_removed} rows from Location file.')
+    move_to_processed(file_path, processed_folder)
+
+def main(input_folder):
+    processed_folder = os.path.join(input_folder, '[Processed]')
+    os.chdir(input_folder)
+
+    # Full Stock File
+    full_stock_files = [f for f in glob.glob('vehicles-autoedit*.xlsx') if os.path.getsize(f) > 2 * 1024 * 1024]
+    if full_stock_files:
+        process_full_stock(full_stock_files[0], processed_folder)
+
+    # 0% Stock File
+    zero_stock_files = [f for f in glob.glob('vehicles-autoedit*.xlsx') if os.path.getsize(f) < 500 * 1024]
+    if zero_stock_files:
+        process_zero_stock(zero_stock_files[0], processed_folder)
+
+    # Location File
+    location_files = glob.glob('vehicles-location-history*.csv')
+    if location_files:
+        process_location(location_files[0], processed_folder)
+
+if __name__ == "__main__":
+    input_folder = r'C:\Users\Tom\OneDrive - Motor Depot\Pricing\Input Files'
+    main(input_folder)

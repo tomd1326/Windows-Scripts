@@ -1,0 +1,47 @@
+Create a Python script for this
+
+
+Input Files folder
+
+C:\Users\Tom\OneDrive - Motor Depot\Pricing\Input Files
+
+There are 3 input files to process
+
+Example file names
+
+
+vehicles-autoedit-29112023092313.xlsx - size is over 2MB - call this Full Stock
+vehicles-autoedit-08122023103918.xlsx - size is under 500KB - call this 0% Stock
+vehicles-location-history-29112023075402.csv - call this Location
+
+
+
+
+Full Stock file
+
+Example file:  vehicles-autoedit-full-stocklist-21112023100626.xlsx
+The file will always start vehicles-autoedit but there could be any string after this.
+ALways XLSX
+Find a file matching this name that is over 2MB in size
+Make a CSV copy - append with _modified
+Find the 3 headers: Notes, Standard Equipment, Classified Features
+Clear all data from all rows for these 3 headers.  Do not delete any rows or columns
+
+
+0% Stock File
+Example file: vehicles-autoedit-08122023103918.xlsx
+Always XSLX
+The file will always start vehicles-autoedit but there could be any string after this.
+Find a file matching this name that is under 500KB in size
+Make a CSV copy - append with _modified
+
+
+
+Location file
+Example file: vehicles-location-history-29112023075402.csv
+The file will always start vehicles-location-history but there could be any string after this.
+Create a copy - append with _modified
+There is a "Date Arrived" header, Format is dd/mm/yyyy.  Sort the new file by Date Arrived old to new
+There is a "Location" header.  Delete all rows where the Location header is not FORECOURT, READY TODAY, GL COMPOUND, SF COMPOUND, TEMP LOAN CAR, COMPANY CAR
+
+Print statements for each file processed and saved
